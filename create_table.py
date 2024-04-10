@@ -16,39 +16,76 @@ def create_table(conn, create_table_sql):
     except Error as e:
         print(e)
 
-
-if __name__ == '__main__':
-    sql_create_students_table = """
-    CREATE TABLE IF NOT EXISTS students (
-     id integer PRIMARY KEY,
-     name text NOT NULL,
-     begin_date text,
-     end_date text
+def main():
+    sql_drop_teachers_table = """DROP TABLE IF EXISTS teachers;"""
+    sql_create_teachers_table = """
+    CREATE TABLE teachers (
+     id INTEGER PRIMARY KEY AUTOINCREMENT,
+     fullname TEXT NOT NULL
     );
     """
 
+    sql_drop_subjects_table = """DROP TABLE IF EXISTS subjects;"""
+    sql_create_subjects_table = """
+    CREATE TABLE subjects (
+     id INTEGER PRIMARY KEY AUTOINCREMENT,
+     name TEXT NOT NULL,
+     teacher_id INTEGER NOT NULL,
+     FOREIGN KEY (teacher_id) REFERENCES teachers (id) ON DELETE CASCADE
+    );
+    """
+
+    sql_drop_groups_table = """DROP TABLE IF EXISTS groups;"""
     sql_create_groups_table = """
-    CREATE TABLE IF NOT EXISTS groups (
-     id integer PRIMARY KEY,
-     name text NOT NULL,
-     priority integer,
-     project_id integer NOT NULL,
-     status Boolean default False,
-     begin_date text NOT NULL,
-     end_date text NOT NULL,
-     FOREIGN KEY (project_id) REFERENCES projects (id)
+    CREATE TABLE groups (
+     id INTEGER PRIMARY KEY,
+     name TEXT NOT NULL
     );
     """
 
-    sql_create_teachers_table = """subjects"""
+    sql_drop_students_table = """DROP TABLE IF EXISTS students;"""
+    sql_create_students_table = """
+    CREATE TABLE students (
+     id INTEGER PRIMARY KEY,
+     fullname TEXT NOT NULL,
+     group_id INTEGER NOT NULL,
+     FOREIGN KEY (group_id) REFERENCES groups (id) ON DELETE CASCADE
+    );
+    """
 
-    sql_create_subjects_table = """subjects"""
+    sql_drop_grades_table = """DROP TABLE IF EXISTS grades;"""
+    sql_create_grades_table = """
+    CREATE TABLE grades (
+     id INTEGER PRIMARY KEY,
+     student_id INTEGER NOT NULL,
+     subject_id INTEGER NOT NULL,
+     grade INTEGER CHECK (grade >= 0 AND grade <= 100) NOT NULL,
+     grade_date TEXT NOT NULL,
+     FOREIGN KEY (student_id) REFERENCES students (id) ON DELETE CASCADE,
+     FOREIGN KEY (subject_id) REFERENCES subjects (id) ON DELETE CASCADE
+    );
+    """
 
     with create_connection(database) as conn:
         if conn is not None:
-            # create projects table
-            create_table(conn, sql_create_projects_table)
-            # create tasks table
-            create_table(conn, sql_create_tasks_table)
+            # create teachers table
+            create_table(conn, sql_drop_teachers_table)
+            create_table(conn, sql_create_teachers_table)
+            # create subjects table
+            create_table(conn, sql_drop_subjects_table)
+            create_table(conn, sql_create_subjects_table)
+            # create groups table
+            create_table(conn, sql_drop_groups_table)
+            create_table(conn, sql_create_groups_table)
+            # create students table
+            create_table(conn, sql_drop_students_table)
+            create_table(conn, sql_create_students_table)
+            # create grades table
+            # create_table(conn, sql_drop_grades_table)
+            # create_table(conn, sql_create_grades_table)
         else:
             print("Error! cannot create the database connection.")
+
+
+if __name__ == '__main__':
+    main()
