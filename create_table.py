@@ -81,8 +81,8 @@ def main():
             create_table(conn, sql_drop_students_table)
             create_table(conn, sql_create_students_table)
             # create grades table
-            # create_table(conn, sql_drop_grades_table)
-            # create_table(conn, sql_create_grades_table)
+            create_table(conn, sql_drop_grades_table)
+            create_table(conn, sql_create_grades_table)
         else:
             print("Error! cannot create the database connection.")
 
